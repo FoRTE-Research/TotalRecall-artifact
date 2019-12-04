@@ -1,0 +1,3 @@
+#define SRAM_TOP 0x2400
+#define SRAM_BOTTOM 0x1C00
+#define CRC_MSG_LENGTH 2000

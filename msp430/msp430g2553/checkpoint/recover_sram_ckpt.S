@@ -1,29 +1,28 @@
 .file "recover_sram_ckpt.S"
 
 #include <msp430.h>
+#include "msp430g2553_tr.h"
+
+.weak init
 
 ; Recovers from an SRAM checkpoint by recomputing and checking the CRC of the SRAM block and restoring the register file
-
-#define CRC_MSG_LENGTH #510
-; Define the top of SRAM. The linker script has been modified so that compiled code does not clobber information here
-#define SRAM_TOP 0x400
 
 .global __recover_sram_ckpt
 __recover_sram_ckpt:
 
-  ; TODO: Putting the init stuff in here for now, hopefully later can call it as a c function?
-  mov.w	#23168,	&0x0120
-  BIC.B #BIT2,  &P1OUT
-  BIC.B #BIT0,  &P1OUT
-  mov.b	#3,	&0x0022
-  mov.b	#42,	&0x002a
-  mov.b	#32,	&0x0029
-  BIS.B #BIT2,  &P1DIR
-  bis.b	#8,	&0x0021
-  bis.b	#8,	&0x0027
-  bis.b	#8,	&0x0025
-  bis.b	#8,	&0x0024
-  bic.b	#8,	&0x0023
+  ; Reinit
+;  mov.w	#23168,	&0x0120
+;  BIC.B #BIT2,  &P1OUT
+;  BIC.B #BIT0,  &P1OUT
+;  mov.b	#3,	&0x0022
+;  mov.b	#42,	&0x002a
+;  mov.b	#32,	&0x0029
+;  BIS.B #BIT2,  &P1DIR
+;  bis.b	#8,	&0x0021
+;  bis.b	#8,	&0x0027
+;  bis.b	#8,	&0x0025
+;  bis.b	#8,	&0x0024
+;  bic.b	#8,	&0x0023
 
   ;MOV.W #CALBC1_16MHZ, BCSCTL1
   ;MOV.W #CALDCO_16MHZ,  DCOCTL
@@ -54,8 +53,8 @@ __recover_sram_ckpt:
 		MOV             #0xFF00,		r_mask
 		MOV 						#0x0, 			r_crc
 		MOV 						#CRC_TABLE, r_ptable
-		MOV 					  #0x0200,		r_pmsg
-		MOV 						CRC_MSG_LENGTH,				r_msg_size
+		MOV 					  #SRAM_BOTTOM,		r_pmsg
+		MOV 						#CRC_MSG_LENGTH,				r_msg_size
 	_rc_loop_r:
 	  SWPB            r_crc								; 1 cycle
 	  MOV.B           r_crc, r_index			; 1 cycle
@@ -100,6 +99,7 @@ __recover_sram_ckpt:
 	NOP
 	MOV.W		&(SRAM_TOP-8),			SR			; Restore SR (R2)
 	NOP
+  call    #init
 	MOV.W		&(SRAM_TOP-4),			PC			; Restore PC (R0)
 	; At this point state should be restored and PC should be wherever we last checkpointed
   _no_checkpoint:

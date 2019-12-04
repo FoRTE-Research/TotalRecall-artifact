@@ -1,10 +1,8 @@
 .file "take_sram_ckpt.S"
 
-; Takes an SRAM checkpoint by placing all registers in SRAM and storing the CRC of the SRAM space
+#include "msp430g2553_tr.h"
 
-#define CRC_MSG_LENGTH #510
-; Define the top of SRAM. The linker script has been modified so that compiled code does not clobber information here
-#define SRAM_TOP 0x400
+; Takes an SRAM checkpoint by placing all registers in SRAM and storing the CRC of the SRAM space
 
 .balign 2
 .global	Port_1
@@ -55,8 +53,8 @@ _prequel_c:
   MOV             #0xFF00,		r_mask
   MOV 						#0x0, 			r_crc
   MOV 						#CRC_TABLE, r_ptable
-  MOV 					  #0x0200,		r_pmsg
-  MOV 						CRC_MSG_LENGTH,				r_msg_size
+  MOV 					  #SRAM_BOTTOM,		r_pmsg
+  MOV 						#CRC_MSG_LENGTH,				r_msg_size
 _rc_loop_c:
   SWPB            r_crc
   MOV.B           r_crc, r_index

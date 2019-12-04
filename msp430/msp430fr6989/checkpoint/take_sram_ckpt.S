@@ -1,13 +1,9 @@
-.file "take_sram_ckpt_fr6989_engine32.S"
+.file "take_sram_ckpt.S"
 
 #include <msp430.h>
+#include "msp430fr6989_tr.h"
 
 ; Takes an SRAM checkpoint by placing all registers in SRAM and storing the CRC of the SRAM space
-
-; Define the top of SRAM. The linker script has been modified so that compiled code does not clobber information here
-#define CRC_MSG_LENGTH  2000
-#define SRAM_TOP        0x2400
-#define SRAM_BOTTOM     0x1C00
 
 .balign 2
 .global	Port_1
