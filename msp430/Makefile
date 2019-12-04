@@ -11,25 +11,30 @@ LDDIR   = $(DEVICE)/ld
 OBJECTS = $(addprefix $(OBJDIR)/, $(outputs))
 
 CFLAGS = -I $(SUPPORT_FILE_DIRECTORY) -mmcu=$(DEVICE) -Os -S -fverbose-asm
-ASMFLAGS = -I $(SUPPORT_FILE_DIRECTORY) -mmcu=$(DEVICE) -D_GNU_ASSEMBLER -Wall -g -fdata-sections -ffunction-sections -T $(LDDIR)/$(DEVICE).ld -ffreestanding $(CKPTDIR)/recover_sram_ckpt.S $(CKPTDIR)/take_sram_ckpt.S -e__recover_sram_ckpt
+ASMFLAGS = -I $(SUPPORT_FILE_DIRECTORY) -mmcu=$(DEVICE) -D_GNU_ASSEMBLER -Wall -g -fdata-sections -ffunction-sections -T $(LDDIR)/$(DEVICE).ld -ffreestanding $(CKPTDIR)/recover_$(SYS)_ckpt.S $(CKPTDIR)/take_$(SYS)_ckpt.S
 LFLAGS = -L $(SUPPORT_FILE_DIRECTORY)
 
 # Don't delete .S files as intermediate
 #.SECONDARY:
 
-.PHONY: check-dev clean
+.PHONY: check-dev check-sys clean
 
-all: check-dev $(OBJECTS)
+all: check-dev check-sys $(OBJECTS)
 
 check-dev:
 ifndef DEVICE
 	$(error DEVICE is not set - rerun make with either DEVICE=msp430g2553 or DEVICE=msp430fr6989)
 endif
 
+check-sys:
+ifndef SYS
+	$(error SYS is not set - rerun make with SYS={sram, flash} for MSP430G2553 or SYS={sram, fram} for MSP430FR6989)
+endif
+
 $(OBJDIR)/%.out: %.S
 	$(CC) $(ASMFLAGS) $(LFLAGS) $< -o $@
 
-%.S: $(SRCDIR)/%.c $(CKPTDIR)/take_sram_ckpt.S $(CKPTDIR)/recover_sram_ckpt.S
+%.S: $(SRCDIR)/%.c $(CKPTDIR)/take_$(SYS)_ckpt.S $(CKPTDIR)/recover_$(SYS)_ckpt.S
 	$(CC) $(CFLAGS) $(LFLAGS) $< -o $@
 
 clean:

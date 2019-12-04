@@ -18,13 +18,13 @@ __recover_flash_ckpt:
   bis.b	#8,	&0x0024
   bic.b	#8,	&0x0023
 
-  BIS.B #0x1,  &P1DIR
   BIC.B #0x1,  &P1OUT
+  BIS.B #0x1,  &P1DIR
 
   ;Flash setup
   MOV.B	#0, &DCOCTL								;Slows down the DCO
-  MOV.B	&CALBC1_16MHZ, &BCSCTL1		;Slows down the DCO
-  MOV.B	&CALDCO_16MHZ, &DCOCTL			;Slows down the DCO
+  MOV.B	&CALBC1_1MHZ, &BCSCTL1		;Slows down the DCO
+  MOV.B	&CALDCO_1MHZ, &DCOCTL			;Slows down the DCO
   ;MOV.W	#-23230, &FCTL2						;Sets flash clock generation
 
   CMP.W		#0xBEEF,	&FLASH_CKPT_START	;	Check if keyword indicates valid checkpoint
@@ -59,7 +59,6 @@ __recover_flash_ckpt:
   ;Redo a flash read to emulate whole checkpoint recovery
   MOV.W		&FLASH_CKPT_START + 6,		SR			; Restore PC (R0)
   BIC.B   #0x1,  &P1OUT
-  JMP .
   MOV.W		&FLASH_CKPT_START + 2,		PC			; Restore PC (R0)
   ; At this point state should be restored and PC should be wherever we last checkpointed
 

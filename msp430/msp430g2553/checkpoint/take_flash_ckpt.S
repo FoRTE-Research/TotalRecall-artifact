@@ -20,7 +20,7 @@
 .type	Port_1, @function
 Port_1:
 
-;MOV.B	#1, &P1OUT	 ; P1OUT,
+MOV.B	#1, &P1OUT	 ; P1OUT,
 ;Flash setup
  MOV.B	#0, &DCOCTL								;Slows down the DCO
  MOV.B	&CALBC1_1MHZ, &BCSCTL1		;Slows down the DCO
@@ -79,7 +79,7 @@ MOV.W	#0xBEEF, &FLASH_CKPT_START	; Indicate we finished the checkpoint
 MOV.W	#FWKEY+LOCK, &FCTL3	 ; FCTL3,
 
 ; timer_flash.c:41:   P1OUT = 0x00;                             // Clear P1.0
-;MOV.B	#0, &P1OUT	 ; P1OUT, tmp29
+MOV.B	#0, &P1OUT	 ; P1OUT, tmp29
 checkpoint_done:
-JMP Port_1
+JMP .
 .size	Port_1, .-Port_1
