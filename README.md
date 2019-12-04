@@ -35,12 +35,15 @@ from Texas Instruments.
 ## Benchmark binaries
 
 ### Pre-built binaries
-We provide pre-generated binaries to make reproducing results possible without needing to set up the toolchain;
+We provide pre-generated TotalRecall binaries to make reproducing results possible without needing to set up the toolchain;
 these binaries are in the prebuilt\_bin subdirectory of each devices directory.
+The prebuilt binaries are equivalent to those generated using "make DEVICE=msp430g2553 SYS=sram" and "make DEVICE=msp430fr6989 SYS=sram".
 
 ### Building binaries
-Run either "make DEVICE=msp430g2553" or "make DEVICE=msp430fr6989" inside the msp430 directory
-depending on which platform you want to build for. The binaries are generated in the
+The makefile requires that you specify two values: DEVICE and SYS.
+DEVICE specifies the device that you want to build for, and SYS specifies the checkpoint strategy (SRAM or non-volatile memory checkpoint).
+Run either "make DEVICE=msp430g2553 SYS={sram, flash}" or "make DEVICE=msp430fr6989 SYS={sram, fram}" inside the msp430 directory
+depending on which platform/system you want to build for. The binaries are generated in the
 {msp430g2553, msp430fr6989}/bin directories.
 
 ### Flashing binaries
@@ -82,3 +85,22 @@ To verify system functionality, we recommend following this example workflow:
 6. Press button S1 to take a checkpoint and halt execution. The LED connected to port P1.0 should flash green.
 7. Reset the device either by pressing the reset button or unplugging the Launchpad. Execution will continue from where it left off when power is restored - if the benchmark was complete when the checkpoint occurred, the RGB LED will immediately turn green. Otherwise, the device will finish the benchmark starting from the point when the checkpoint was taken (e.g., if the checkpoint is taken 7 seconds into the quicksort benchmark it should reach completion in 3 seconds following a reset).
 8. Verify that TotalRecall detects when SRAM state is lost by taking a checkpoint, unplugging the Launchpad, and then either waiting an extended time period (>= 5 minutes) or holding down the reset button, both of which drain the processor supply voltage. Restoring power to the device will start the benchmark execution from the beginning.
+
+## Re-use and Customization
+##### New user code
+TotalRecall can be added to existing code with no modifications; just link against the checkpointing libraries and new linker script.
+The easiest way to do this in this repository is to add your desired output file to the "outputs" list in the Makefile; make will search the src directory of your chosen device for a C source file of the same name.
+##### Baseline comparison
+We provide baseline systems for comparison.
+On the MSP430G2553, users have two options:
+- The TotalRecall checkpointing system in which a checkpoint is taken in SRAM and data integrity is verified using a software CRC16 algorithm.
+- A non-volatile checkpointing system in which a checkpoint is taken by writing the register file and SRAM to Flash memory.
+
+On the MSP430FR6989, users have two different options:
+- A TotalRecall system similar to the one described above, but using the CRC32 hardware engine instead of a software implementation.
+- A non-volatile system similar to the one described above, but the checkpoint is written to FRAM.
+##### New platforms
+Porting TotalRecall currently requires several minor changes; in general, follow the given examples for the msp430g2553 and msp430fr6989.
+- TotalRecall is currently implemented as MSP430 assembly and as such only supports that architecture.
+- The take_sram_ckpt.S and recover_sram_ckpt.S files include header files for each device of the form "\<device name\>\_tr.h" (e.g., "msp430fr6989_tr.h"). This header file specifies the start address, end address, and length of the memory to CRC (which is start_address-end_address-2 so as to not CRC the saved CRC result). Create a new header file for your device with the correct values and make copies of the take_sram_ckpt.S and recover_sram_ckpt.S files that include the correct header file.
+- The linker script file must also be modified to clear space near the high address of the SRAM for the saved register file and checkpoint data. Modify the new device's linker script to make the RAM section appear approximately 50 bytes smaller.
