@@ -1,0 +1,1 @@
+These are not the same checkpoint routines as in the msp430g2553 folder; these use the CRC module on the MSP430FR6989 to improve checkpoint performance.
