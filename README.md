@@ -73,9 +73,12 @@ Because creating a realistic energy harvesting environment is difficult without 
 The TotalRecall checkpointing function is written as an ISR; in a real energy harvesting environment, it is triggered
 by a "brownout detected" interrupt from a supply voltage supervisor. In these artifacts, it is triggered by a GPIO
 interrupt that is connected to button S1 on the Launchpads (P1.3 on the MSP-EXP430G2ET and P1.1 on the MSP-EXP430FR6989).
-To verify checkpoint functionality, we recommend following this example workflow:
-1. Flash the quicksort benchmark to the MSP430G2553.
-2. Close mspdebug to allow the MCU to execute freely.
-4. Press button S1 to take a checkpoint and halt execution. The LED connected to port P1.0 should flash green.
-5. Reset the device either by pressing the reset button or unplugging the Launchpad. Execution will continue from where it left off when power is restored - if the benchmark was complete when the checkpoint occurred, the RGB LED will immediately turn green. Otherwise, the device will finish the benchmark starting from the point when the checkpoint was taken (e.g., if the checkpoint is taken 7 seconds into the quicksort benchmark it should reach completion in 3 seconds following a reset).
-6. Verify that TotalRecall detects when SRAM state is lost by taking a checkpoint, unplugging the Launchpad, and then either waiting an extended time period (>= 5 minutes) or holding down the reset button, both of which drain the processor supply voltage. Restoring power to the device will start the benchmark execution from the beginning.
+To verify system functionality, we recommend following this example workflow:
+1. Clone this repository using `git clone https://github.com/FoRTE-Research/TotalRecall-artifact`.
+2. Install software dependencies using the instructions above.
+3. Run `make DEVICE=msp430g2553` in the msp430 directory.
+4. Flash the quicksort (msp430/msp430g2553/bin/quicksort.out) benchmark to the MSP430G2553.
+5. Close mspdebug to allow the MCU to execute freely.
+6. Press button S1 to take a checkpoint and halt execution. The LED connected to port P1.0 should flash green.
+7. Reset the device either by pressing the reset button or unplugging the Launchpad. Execution will continue from where it left off when power is restored - if the benchmark was complete when the checkpoint occurred, the RGB LED will immediately turn green. Otherwise, the device will finish the benchmark starting from the point when the checkpoint was taken (e.g., if the checkpoint is taken 7 seconds into the quicksort benchmark it should reach completion in 3 seconds following a reset).
+8. Verify that TotalRecall detects when SRAM state is lost by taking a checkpoint, unplugging the Launchpad, and then either waiting an extended time period (>= 5 minutes) or holding down the reset button, both of which drain the processor supply voltage. Restoring power to the device will start the benchmark execution from the beginning.
