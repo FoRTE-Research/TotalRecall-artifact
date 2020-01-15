@@ -40,8 +40,8 @@ __recover_fram_ckpt:
   NOP
 
   ;Restore all of SRAM from FRAM
-  MOV.W		#0x1C00, R11
-  MOV.W		#FRAM_CKPT_START + 32, R10
+  MOV.W		#0x1C00, R10
+  MOV.W		#FRAM_CKPT_START + 32, R11
   RESTORE_LOOP:
     MOV.W		@R10, @R11
     INCD.W	R11
@@ -74,7 +74,7 @@ __recover_fram_ckpt:
     MOV.W		@R10, @R11
     INCD.W	R11
     INCD.W	R10
-    CMP.W		#0x2400, R11
+    CMP.W		#0x2400, R10
     JNE RESTORE_LOOP
 
   MOV.W		&FRAM_CKPT_START + 30,		R15			; Begin restoring general purpose registers

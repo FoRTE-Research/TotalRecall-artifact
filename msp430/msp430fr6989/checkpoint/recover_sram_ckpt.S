@@ -18,26 +18,26 @@ __recover_sram_ckpt:
 	JNZ			_no_checkpoint												; If not, just jump to main and begin execution from start
 
   ; Re-initialize all peripherals, config registers, etc
-;  MOV.W   #WDTPW|WDTHOLD,     &WDTCTL
-;  MOV.W   #0x02,      &P1OUT
-;  MOV.W   #0x02,      &P1REN
-;  MOV.W   #0xFD,      &P1DIR  ;Set all but P1.1 to output
-;  MOV.W   #0x02,      &P1IES
-;  MOV.W   #0x02,      &P1IE
-;
-;  ; Clock setup - 1 MHz
-;  MOV.B #CSKEY >> 8,          &CSCTL0_H
-;  MOV.W #DCOFSEL_0 | DCORSEL, &CSCTL1
-;  MOV.W #SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK, &CSCTL2
-;  MOV.W #DIVA__1 | DIVS__1 | DIVM__1, &CSCTL3
-;  MOV.B #0, &CSCTL0_H
-;  ; Set 0 wait state for FRAM accesses
-;  MOV.W #FRCTLPW | NWAITS_0,  &FRCTL0
-;
-;  BIC.W   #LOCKLPM5,  &PM5CTL0
-;  MOV.W   #0x0,       &P1IFG
-;
-;  BIS.B   #0x80,      &P9DIR
+  MOV.W   #WDTPW|WDTHOLD,     &WDTCTL
+  MOV.W   #0x02,      &P1OUT
+  MOV.W   #0x02,      &P1REN
+  MOV.W   #0xFD,      &P1DIR  ;Set all but P1.1 to output
+  MOV.W   #0x02,      &P1IES
+  MOV.W   #0x02,      &P1IE
+
+  ; Clock setup - 1 MHz
+  MOV.B #CSKEY >> 8,          &CSCTL0_H
+  MOV.W #DCOFSEL_0 | DCORSEL, &CSCTL1
+  MOV.W #SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK, &CSCTL2
+  MOV.W #DIVA__1 | DIVS__1 | DIVM__1, &CSCTL3
+  MOV.B #0, &CSCTL0_H
+  ; Set 0 wait state for FRAM accesses
+  MOV.W #FRCTLPW | NWAITS_0,  &FRCTL0
+
+  BIC.W   #LOCKLPM5,  &PM5CTL0
+  MOV.W   #0x0,       &P1IFG
+
+  BIS.B   #0x80,      &P9DIR
 
   NOP
   EINT
