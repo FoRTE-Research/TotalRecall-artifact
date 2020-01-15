@@ -79,7 +79,7 @@ interrupt that is connected to button S1 on the Launchpads (P1.3 on the MSP-EXP4
 To verify system functionality, we recommend following this example workflow:
 1. Clone this repository using `git clone https://github.com/FoRTE-Research/TotalRecall-artifact`.
 2. Install software dependencies using the instructions above.
-3. Run `make DEVICE=msp430g2553` in the msp430 directory.
+3. Run `make DEVICE=msp430g2553 SYS=sram` in the msp430 directory.
 4. Flash the quicksort (msp430/msp430g2553/bin/quicksort.out) benchmark to the MSP430G2553.
 5. Close mspdebug to allow the MCU to execute freely.
 6. Press button S1 to take a checkpoint and halt execution. The LED connected to port P1.0 should flash green.
@@ -102,5 +102,6 @@ On the MSP430FR6989, users have two different options:
 ##### New platforms
 Porting TotalRecall currently requires several minor changes; in general, follow the given examples for the msp430g2553 and msp430fr6989.
 - TotalRecall is currently implemented as MSP430 assembly and as such only supports that architecture.
-- The take_sram_ckpt.S and recover_sram_ckpt.S files include header files for each device of the form "\<device name\>\_tr.h" (e.g., "msp430fr6989_tr.h"). This header file specifies the start address, end address, and length of the memory to CRC (which is start_address-end_address-2 so as to not CRC the saved CRC result). Create a new header file for your device with the correct values and make copies of the take_sram_ckpt.S and recover_sram_ckpt.S files that include the correct header file.
+- The take_sram_ckpt.S and recover_sram_ckpt.S files include header files for each device of the form "\<device name\>\_tr.h" (e.g., "msp430fr6989_tr.h"). This header file specifies the start address, end address, and length of the memory to CRC (which is end_address-start_address-2 so as to not CRC the saved CRC result). Create a new header file for your device with the correct values and make copies of the take_sram_ckpt.S and recover_sram_ckpt.S files that include the correct header file.
 - The linker script file must also be modified to clear space near the high address of the SRAM for the saved register file and checkpoint data. Modify the new device's linker script to make the RAM section appear approximately 50 bytes smaller.
+- The checkpoint recovery routines expect an initialization function with the signature `void init()` that is called before restoring the saved PC. This function is intended to be used for hardware setup that needs to occur after every reset (start/stop timers, GPIO pins, etc).
