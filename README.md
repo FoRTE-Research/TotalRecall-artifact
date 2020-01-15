@@ -90,6 +90,7 @@ To verify system functionality, we recommend following this example workflow:
 ##### New user code
 TotalRecall can be added to existing code with no modifications; just link against the checkpointing libraries and new linker script.
 The easiest way to do this in this repository is to add your desired output file to the "outputs" list in the Makefile; make will search the src directory of your chosen device for a C source file of the same name.
+When providing feedback that the benchmark is complete, ensure that the feedback is continually set in the post-benchmark loop so that it appears if a checkpoint recovers after the benchmark completes (see quicksort.c for an example of this).
 ##### Baseline comparison
 We provide baseline systems for comparison.
 On the MSP430G2553, users have two options:
